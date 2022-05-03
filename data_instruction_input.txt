@@ -1,0 +1,7 @@
+LW $t0, 28($zero)
+LW $t1, 29($zero)
+LW $t2, 30($zero)
+LW $t3, 31($zero)
+LW $t4, 32($zero)
+LW $t5, 33($zero)
+LW $t6, 34($zero)
