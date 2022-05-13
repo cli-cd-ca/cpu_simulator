@@ -35,9 +35,7 @@ class Assembler:
             if len(instr[0]) == 8: # memory address
                 if len(instr) == 2:
                     if "-" in instr[1]:
-                        data = instr[1].split("-")
-                        data = bin(int(instr[1]))[3:].zfill(8)
-                        data = list(data)
+                        data = list(bin(int(instr[1].split("-")[1]))[2:].zfill(8))
                         data[0] = "1"
                         data = "".join(data)
                     else:
@@ -45,8 +43,7 @@ class Assembler:
                     instr[1] = "".zfill(16)
                     instr.append(data)
                 else:
-                    instr.append("1".zfill(16)) # 0 means store data and 1 means retrieve data
-                    instr.append("".zfill(8))
+                    instr.append("1".zfill(24)) # 0 means store data and 1 means retrieve data
                 machine_code.append("".join(instr))
 
             # parse instructions
@@ -153,8 +150,7 @@ class Assembler:
                 rt = bin(self.register_idx_key[instr[1].split(",")[0].split("$")[1]])[2:].zfill(5) 
                 ofs_base = instr[2].split("(")
                 ofs = bin(int(ofs_base[0]))[2:].zfill(16)
-                base = ofs_base[1].split(")")[0]
-                base = bin(self.register_idx_key[base.split("$")[1]])[2:].zfill(5)
+                base = bin(self.register_idx_key[ofs_base[1].split(")")[0].split("$")[1]])[2:].zfill(5)
                 instr[1] = base
                 instr[2] = rt
                 instr.append(ofs)

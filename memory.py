@@ -23,8 +23,7 @@ class Memory:
         return idx
 
     def set_memory_idx(self, value):
-        idx = self.memory_idx + value
-        idx = self.adjust_memory_idx(idx)
+        idx = self.adjust_memory_idx(self.memory_idx + value)
         self.memory_idx = idx
 
     def read_memory(self, address, memory="main_reg"):
@@ -144,8 +143,7 @@ class MemoryBus:
             self.update_display(f"\nMemory Bus: {line}", "\n")
             idx_lst = []
             for i in range(4):
-                idx = self.main_memory.memory_idx + i
-                idx = self.main_memory.adjust_main_memory_idx(idx)
+                idx = self.main_memory.adjust_main_memory_idx(self.main_memory.memory_idx + i)
                 idx_lst.append(idx)
             for i in range(4):
                 self.address_bus = bin(idx_lst[i])[2:].zfill(8)

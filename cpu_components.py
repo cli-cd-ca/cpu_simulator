@@ -36,8 +36,7 @@ class ControlUnit:
         return pc
 
     def set_program_counter(self, value):
-        pc = self.program_counter + value
-        pc = self.adjust_program_counter(pc)
+        pc = self.adjust_program_counter(self.program_counter + value)
         self.program_counter = pc
 
     def read_memory(self, name, address):
@@ -55,8 +54,7 @@ class ControlUnit:
             instr = []
             self.update_display(f"\nCPU program counter: {bin(self.program_counter)[2:].zfill(8)}", "\n")
             for j in range(4): # fetches instruction from cache or main memory
-                pc = self.program_counter + j
-                pc = self.adjust_program_counter(pc)
+                pc = self.adjust_program_counter(self.program_counter + j)
                 if self.cache_on and j == 0:
                     self.memory_address_reg = bin(pc)[2:].zfill(8)
                     self.memory_bus.address_bus = self.memory_address_reg
@@ -117,8 +115,7 @@ class ControlUnit:
                     result = self.ALU.op(opcode, a, b, func_code=func_code)
                     self.write_memory(self.registers, rd, result)
                 elif opcode == "001000":
-                    imd = bin(int(instruction[16:], 2))[2:]
-                    imd = list(imd)
+                    imd = list(bin(int(instruction[16:], 2))[2:])
                     imd.insert(0, "0")
                     result = self.ALU.op(opcode, a, "".join(imd))
                     self.write_memory(self.registers, rt, result)
@@ -128,9 +125,7 @@ class ControlUnit:
                     result = self.ALU.op(opcode, a, b)
                     if result == 0:
                         value = int(self.ALU.op("000000", ofs, func_code="000000", shift=2), 2)
-                        pc = self.program_counter
-                        pc += value
-                        pc = self.adjust_program_counter(pc)
+                        pc = self.adjust_program_counter(self.program_counter + value)
                         self.update_display(f"CPU program counter branching to main memory address {pc}", "\n")
             elif instruction[26:] in ("000000","000011","111001"):
                 rt = int(instruction[11:16], 2)
@@ -194,13 +189,11 @@ class ControlUnit:
 
         elif opcode in ("000010", "000011"):
             instr_idx = instruction[6:]
-            pc = int(self.ALU.op("000000", instr_idx, func_code="000000", shift=2).zfill(32), 2)
-            pc = self.adjust_program_counter(pc)
+            pc = self.adjust_program_counter(int(self.ALU.op("000000", instr_idx, func_code="000000", shift=2).zfill(32), 2))
             value = pc - self.program_counter
             self.update_display(f"CPU program counter jumping to main memory address {pc}", "\n")
             if opcode == "000011":
-                link_pc = pc + 8
-                link_pc = self.adjust_program_counter(link_pc)
+                link_pc = self.adjust_program_counter(pc + 8)
         
         return value, link_pc
 
@@ -320,9 +313,7 @@ class ALU:
     def _2s_complement(self, total):
         for i in range(len(total)):
             total[i] = str(self.NOT_gate_(int(total[i])))
-        total = "".join(total)
-        total = self.full_adder(total, "01", 0)
-        total = list(total)
+        total = list(self.full_adder("".join(total), "01", 0))
         total[0] = "1"
         return total
         
@@ -420,8 +411,6 @@ class ALU:
     def full_subt(self, a, b):
         d_total = []
         s = "0"
-        a_s = a[0]
-        b_s = b[0]
         if int(a) < int(b):
             a, b = b, a
             s = "1"
@@ -501,8 +490,7 @@ class ALU:
                 p_total.pop(1)
                 p_total.pop(1)
         if p_s == "1":
-            p_total = list(p_total[0])
-            p_total = self._2s_complement(p_total)
+            p_total = self._2s_complement(list(p_total[0]))
         p = "".join(p_total)
         self.accumulator_reg = p
         return self.accumulator_reg
